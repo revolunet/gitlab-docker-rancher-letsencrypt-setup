@@ -1,0 +1,20 @@
+version: "2"
+
+services:
+  rancher:
+    restart: always
+    image: rancher/server
+    hostname: rancher.test.revolunet.org
+    container_name: rancher
+    environment:
+      - VIRTUAL_HOST=rancher.test.revolunet.org
+      - VIRTUAL_PORT=8080
+      - LETSENCRYPT_HOST=rancher.test.revolunet.org
+      - LETSENCRYPT_EMAIL=foo@bar.com
+    volumes:
+      - "/root/docker/mysql-datadir:/var/lib/mysql"
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

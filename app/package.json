@@ -1,0 +1,28 @@
+{
+  "name": "basic1",
+  "version": "1.0.0",
+  "author": "Julien Bouquillon <julien@revolunet.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/revolunet/basic1.git"
+  },
+  "homepage": "https://revolunet.github.io/basic1/",
+  "bugs": {
+    "url": "https://github.com/revolunet/basic1/issues"
+  },
+  "scripts": {
+    "start": "micro -p ${PORT:-3000}",
+    "test-coverage": "jest --coverage ./test",
+    "test": "jest"
+  },
+  "dependencies": {
+    "micro": "^9.0.2"
+  },
+  "devDependencies": {
+    "expect": "^21.2.1",
+    "jest": "^21.2.1",
+    "request-promise": "^4.2.2",
+    "test-listen": "^1.0.2"
+  }
+}

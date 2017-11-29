@@ -1,0 +1,59 @@
+image: node:7.7.2-alpine
+
+stages:
+  - init
+  - tests
+  - create-docker-image
+  - deploy
+
+cache:
+  paths:
+    - node_modules/
+
+init:
+  stage: init
+  script:
+    - npm cache clean
+    - rm -rf node-modules
+    - npm install
+
+run_tests:
+  stage: tests
+  script:
+    - npm run test-coverage
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+
+prettier_check:
+  stage: tests
+  script:
+    - npm install prettier prettier-check
+    - ./node_modules/.bin/prettier-check index.js
+
+# https://docs.gitlab.com/ce/ci/docker/using_docker_build.html
+createdockerimage:
+  stage: create-docker-image
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    REGISTRY: registry.test.revolunet.org
+    DOCKER_DRIVER: overlay2
+  script:
+   - docker build -t $REGISTRY/basic1 .
+   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $REGISTRY
+   - docker push $REGISTRY/basic1:latest
+
+deploy_docker:
+  stage: deploy
+  image: docker:latest
+  script:
+    - echo "Deploy"
+  variables:
+    REGISTRY: registry.test.revolunet.org
+  environment:
+    name: review/$CI_COMMIT_SHA
+    url: http://$CI_ENVIRONMENT_SLUG.basic1.test.revolunet.org
+  only:
+    - branches
+  script:
+    docker run -d --name basic1-${CI_ENVIRONMENT_SLUG} -e "VIRTUAL_HOST=${CI_ENVIRONMENT_SLUG}.basic1.test.revolunet.org" -e "VIRTUAL_PORT=80" --network="nginx-proxy" $REGISTRY/basic1:latest

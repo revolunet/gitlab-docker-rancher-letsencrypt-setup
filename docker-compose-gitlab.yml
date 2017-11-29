@@ -1,0 +1,43 @@
+version: "2"
+
+services:
+  gitlab:
+    restart: always
+    image: gitlab/gitlab-ce:latest
+    hostname: gitlab.test.revolunet.org
+    container_name: gitlab
+    environment:
+      - VIRTUAL_HOST=gitlab.test.revolunet.org
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=gitlab.test.revolunet.org
+      - LETSENCRYPT_EMAIL=foo@bar.com
+    ports:
+      - "24:22"
+    volumes:
+      - "/srv/gitlab/config:/etc/gitlab"
+      - "/srv/gitlab/logs:/var/log/gitlab"
+      - "/srv/gitlab/data:/var/opt/gitlab"
+
+  runner:
+    restart: always
+    image: gitlab/gitlab-runner:latest
+    container_name: "gitlab-runner"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/srv/gitlab-runner/config:/etc/gitlab-runner"
+
+  registry:
+    restart: always
+    image: registry:2
+    hostname: registry.test.revolunet.org
+    container_name: registry
+    environment:
+      - VIRTUAL_HOST=registry.test.revolunet.org
+      - VIRTUAL_PORT=5000
+      - LETSENCRYPT_HOST=registry.test.revolunet.org
+      - LETSENCRYPT_EMAIL=foo@bar.com
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

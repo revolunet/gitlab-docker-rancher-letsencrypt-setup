@@ -1,4 +1,4 @@
-# GitLab + docker + letsencrypt CI/CD
+# GitLab + docker + LetsEncrypt CI/CD
 
 This guide will help you setup a full **automated private dev environment with continuous integration and deployment** infrastructure, using open-source tools.
 
@@ -42,13 +42,13 @@ I broke the infra in several containers groups
 
 Use [docker-compose-nginx.yml](./docker-compose-nginx.yml) to create containers for the nginx proxy. We use [letsencrypt-nginx-proxy-companion](https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion) that automate the nginx vhosts configuration and create SSL certs as needed.
 
-Once the containers are ready, you can add containers to your infra like this :
+Once the containers are ready, you can add containers to your infra just like this :
 
 ```sh
 docker run -d \
   --name example-app \
   -e "VIRTUAL_HOST=whoami.test.revolunet.com" \
-  -e "WEB_PORTS=8000" \
+  -e "VIRTUAL_PORT=8000" \
   -e "LETSENCRYPT_HOST=whoami.test.revolunet.com" \
   -e "LETSENCRYPT_EMAIL=contact@revolunet.com" \
   --network="nginx-proxy" \
@@ -81,6 +81,8 @@ now, a single `git push` will hit GitLab and trigger CI/CD when `.gitlab-ci.yml`
 ### rancher
 
 Use [docker-compose-rancher.yml](./docker-compose-rancher.yml) to create the rancher container.
+
+You can then use the Rancher UI to monitor your infrastructure, deploy new containers...
 
 ### Todo :
 
